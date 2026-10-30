@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al-Lughah Explorer - LMS Gamifikasi Bahasa Arab</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae0fd',
+              500: '#0284c7',
+              600: '#0265d6',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              dark: '#0b192c'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            arabic: ['Amiri', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .font-arabic { font-family: 'Amiri', serif; }
+    .rtl { direction: rtl; text-align: right; }
+    .ltr { direction: ltr; text-align: left; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #1e3a8a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+
+    /* Glassmorphic effect */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .glass-nav {
+      background: rgba(11, 25, 44, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-blue-600 selection:text-white">
+
+  <!-- ================= HEADER / NAVBAR ================= -->
+  <header class="sticky top-0 z-50 glass-nav shadow-lg border-b border-blue-900/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('dashboard')">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-700 to-cyan-500 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-500/30">
+          <i data-lucide="book-open-check"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-200 via-cyan-200 to-white bg-clip-text text-transparent">
+            Al-Lughah Explorer
+          </h1>
+          <p class="text-xs text-blue-400 font-medium">LMS Gamifikasi Nahwu & Shorof</p>
+        </div>
+      </div>
+
+      <!-- User Nav Profile / Dynamic Header -->
+      <div id="navUserArea" class="hidden items-center space-x-4">
+        <div class="hidden md:flex items-center bg-slate-900/80 border border-blue-800/50 px-3 py-1.5 rounded-full space-x-3">
+          <span id="navRoleBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-600/30 text-blue-300 border border-blue-500/30">
+            👨‍🎓 Murid
+          </span>
+          <span id="navUserName" class="text-sm font-semibold text-slate-200">Ahmad</span>
+          <div id="navXpContainer" class="flex items-center text-amber-400 text-xs font-extrabold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">
+            <i data-lucide="zap" class="w-3.5 h-3.5 mr-1 fill-amber-400"></i>
+            <span id="navUserXp">0 XP</span>
+          </div>
+        </div>
+
+        <button onclick="handleLogout()" class="text-slate-400 hover:text-red-400 p-2 rounded-xl hover:bg-red-500/10 transition border border-transparent hover:border-red-500/30" title="Keluar">
+          <i data-lucide="log-out" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- 1. AUTH PAGE (LOGIN & REGISTER & FORGOT PASSWORD) -->
+    <div id="authSection" class="max-w-md mx-auto my-8">
+      <div class="glass-card rounded-3xl p-8 shadow-2xl border border-blue-800/40 relative overflow-hidden">
+        
+        <!-- Subtle Glow -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-600/20 rounded-full blur-3xl"></div>
+
+        <!-- Auth Tabs -->
+        <div class="flex border-b border-slate-800 mb-6 font-semibold">
+          <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-3 text-center border-b-2 border-blue-500 text-blue-400 transition">
+            Masuk
+          </button>
+          <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition">
+            Daftar Baru
+          </button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Email atau Nama Pengguna</label>
+            <div class="relative">
+              <i data-lucide="user" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="text" id="loginIdentifier" required placeholder="Contoh: ahmad@gmail.com / Ahmad" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="block text-xs font-medium text-slate-300">Kata Sandi</label>
+              <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-blue-400 hover:underline">
+                Lupa Sandi?
+              </button>
+            </div>
+            <div class="relative">
+              <i data-lucide="key-round" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition transform active:scale-95 flex items-center justify-center space-x-2 mt-6">
+            <span>Masuk ke Akun</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="registerForm" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Pilih Peran Akun</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="regRole" value="murid" checked class="peer sr-only">
+                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 peer-checked:border-blue-500 peer-checked:bg-blue-600/10 text-center transition">
+                  <div class="text-2xl mb-1">👨‍🎓</div>
+                  <div class="text-xs font-bold text-slate-200">Murid (Ath-Thalib)</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="regRole" value="guru" class="peer sr-only">
+                <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 peer-checked:border-blue-500 peer-checked:bg-blue-600/10 text-center transition">
+                  <div class="text-2xl mb-1">👨‍🏫</div>
+                  <div class="text-xs font-bold text-slate-200">Guru / Ustaz</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Nama Lengkap</label>
+            <input type="text" id="regName" required placeholder="Ahmad Zaki" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Alamat Email</label>
+            <input type="email" id="regEmail" required placeholder="ahmad@gmail.com" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Kata Sandi</label>
+            <input type="password" id="regPassword" required placeholder="••••••••" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500">
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/30 transition transform active:scale-95 flex items-center justify-center space-x-2 mt-6">
+            <span>Daftar Sekarang</span>
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+          </button>
+        </form>
+
+        <!-- System Reset Footer Button -->
+        <div class="mt-8 pt-6 border-t border-slate-800/80 text-center">
+          <button onclick="handleResetAllData()" class="inline-flex items-center text-xs text-red-400 hover:text-red-300 transition">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 mr-1.5"></i>
+            <span>Reset Ulang Browser / Cleared LocalStorage</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+      <div class="glass-card max-w-sm w-full rounded-2xl p-6 border border-blue-500/30 relative">
+        <h3 class="text-lg font-bold text-slate-100 mb-2 flex items-center">
+          <i data-lucide="key-round" class="w-5 h-5 text-blue-400 mr-2"></i>
+          Riset Kata Sandi
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">Masukkan email terdaftar Anda untuk mengatur ulang kata sandi baru.</p>
+
+        <form onsubmit="handleForgotPassword(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Email Terdaftar</label>
+            <input type="email" id="resetEmail" required placeholder="email@domain.com" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1">Kata Sandi Baru</label>
+            <input type="password" id="resetNewPassword" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:border-blue-500 focus:outline-none">
+          </div>
+          <div class="flex justify-end space-x-2 pt-2">
+            <button type="button" onclick="closeForgotPasswordModal()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">
+              Batal
+            </button>
+            <button type="submit" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow">
+              Simpan Sandi Baru
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- 2. DASHBOARD MURID (STUDENT VIEW) -->
+    <div id="studentDashboard" class="hidden space-y-8">
+      
+      <!-- Welcome Banner -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-blue-800/40 relative overflow-hidden bg-gradient-to-r from-blue-950/60 via-slate-900/90 to-indigo-950/60">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div>
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 mb-3">
+              👨‍🎓 Ath-Thalib (Murid)
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Selamat Belajar, <span id="dashUserName" class="text-cyan-400">Ahmad</span>!
+            </h2>
+            <p class="text-sm text-slate-300 mt-1 max-w-xl">
+              Pilih tema Nahwu & Shorof di bawah ini untuk memulai latihan bertahap, kuis evaluasi 20 soal dengan analisis Nahwu, dan mini game interaktif!
+            </p>
+          </div>
+
+          <div class="flex items-center space-x-4 bg-slate-900/90 p-4 rounded-2xl border border-blue-800/50">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 border border-amber-500/30">
+              <i data-lucide="trophy" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Total Skor XP</p>
+              <div class="text-2xl font-black text-amber-400 flex items-center">
+                <span id="dashUserXp">0</span>
+                <span class="text-xs ml-1 text-slate-400 font-normal">XP</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Curriculum Themes List (6 Themes) -->
+      <div>
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-slate-100 flex items-center">
+            <i data-lucide="book-marked" class="w-6 h-6 text-blue-400 mr-2"></i>
+            Kurikulum Pembelajaran Nahwu
+          </h3>
+          <span class="text-xs text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full font-semibold border border-blue-500/20">6 Tema Utama</span>
+        </div>
+
+        <div id="themeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Rendered dynamically by JS -->
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- 3. GURU MONITORING PANEL (TEACHER VIEW) -->
+    <div id="teacherDashboard" class="hidden space-y-8">
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-indigo-800/40 bg-gradient-to-r from-indigo-950/60 via-slate-900/90 to-blue-950/60">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 mb-2">
+              👨‍🏫 Panel Pemantauan Guru / Ustaz
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Daftar Progres Murid</h2>
+            <p class="text-sm text-slate-300 mt-1">Pantau perkembangan skor XP dan pengerjaan kuis siswa secara real-time.</p>
+          </div>
+          <button onclick="renderTeacherDashboard()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl flex items-center justify-center space-x-2 transition">
+            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+            <span>Segarkan Data</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-6 border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-300">
+            <thead class="text-xs text-blue-400 uppercase bg-slate-900/80 border-b border-slate-800">
+              <tr>
+                <th scope="col" class="px-6 py-4">No</th>
+                <th scope="col" class="px-6 py-4">Nama Murid</th>
+                <th scope="col" class="px-6 py-4">Email</th>
+                <th scope="col" class="px-6 py-4">Total XP</th>
+                <th scope="col" class="px-6 py-4">Status Kuis Terakhir</th>
+              </tr>
+            </thead>
+            <tbody id="teacherTableBody" class="divide-y divide-slate-800/60">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- 4. QUIZ MODULE (20 QUESTIONS PER THEME) -->
+    <div id="quizSection" class="hidden space-y-6 max-w-4xl mx-auto">
+      
+      <!-- Quiz Header -->
+      <div class="glass-card rounded-2xl p-4 sm:p-6 border border-blue-800/40 flex items-center justify-between">
+        <button onclick="navigateTo('dashboard')" class="text-xs font-bold text-slate-300 hover:text-white flex items-center space-x-1.5 bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Kembali ke Dashboard</span>
+        </button>
+        <div class="text-center">
+          <h3 id="quizThemeTitle" class="text-base sm:text-lg font-bold text-blue-300">Tema 01</h3>
+          <p id="quizThemeSub" class="text-xs text-slate-400">Soal 1 Dari 20</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400 block">Progres</span>
+          <span id="quizProgressNum" class="text-sm font-extrabold text-cyan-400">1 / 20</span>
+        </div>
+      </div>
+
+      <!-- Quiz Card -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-blue-800/30 space-y-6">
+        
+        <!-- Question Type Badge & Text Reading if Qira'ah -->
+        <div id="qiraahBox" class="hidden bg-slate-900/90 border border-blue-900/60 rounded-2xl p-5 space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-amber-400 flex items-center">
+              <i data-lucide="file-text" class="w-4 h-4 mr-1"></i> Teks Qira'ah (Bacaan Utuh)
+            </span>
+            <span class="text-xs text-slate-400">Bacalah seksama untuk menjawab</span>
+          </div>
+          <p id="qiraahText" class="font-arabic text-2xl sm:text-3xl text-amber-200 rtl leading-relaxed py-2">
+            <!-- Teks Arab Qiraah -->
+          </p>
+        </div>
+
+        <!-- Question Prompt (Dual Language) -->
+        <div class="space-y-3">
+          <span id="questionTypeBadge" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-600/20 text-blue-300 border border-blue-500/30">
+            Nahwu & Tarjamah
+          </span>
+          <h4 id="questionTitle" class="text-base sm:text-lg font-semibold text-slate-100">
+            Manakah mubtada' yang tepat untuk melengkapi kalimat berikut?
+          </h4>
+          <!-- Big Arabic Question Text -->
+          <div id="arabicQuestionContainer" class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800/80 text-center my-4">
+            <p id="arabicQuestionText" class="font-arabic text-3xl sm:text-4xl text-cyan-300 rtl leading-loose">
+              ... نَشِيطٌ فِي المَدْرَسَةِ
+            </p>
+          </div>
+        </div>
+
+        <!-- Options Grid (Pure Arabic Choice) -->
+        <div id="optionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Dynamic 4 Options -->
+        </div>
+
+        <!-- Feedback & Nahwu Analysis Card (Shows after selecting) -->
+        <div id="feedbackCard" class="hidden rounded-2xl p-5 border space-y-3 transition">
+          <div class="flex items-center space-x-2">
+            <div id="feedbackIcon" class="w-8 h-8 rounded-full flex items-center justify-center font-bold"></div>
+            <h5 id="feedbackTitle" class="text-base font-bold">Jawaban Benar! (+10 XP)</h5>
+          </div>
+          
+          <!-- Mandatory Nahwu Analysis Box -->
+          <div class="bg-slate-950/70 p-4 rounded-xl border border-slate-800 space-y-2 text-sm text-slate-300">
+            <p class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1"></i> Analisis Nahwu & Penjelasan:
+            </p>
+            <p id="feedbackAnalysis" class="text-slate-200 leading-relaxed text-sm">
+              <!-- Explanation text -->
+            </p>
+          </div>
+        </div>
+
+        <!-- Quiz Navigation Buttons -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+          <button id="prevQuestionBtn" onclick="navigateQuiz(-1)" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-700 flex items-center space-x-2">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Sebelumnya</span>
+          </button>
+
+          <button id="nextQuestionBtn" onclick="navigateQuiz(1)" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center space-x-2 shadow-lg shadow-blue-600/30">
+            <span>Selanjutnya</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- 5. MINI GAMES MODULE (THEME-SPECIFIC) -->
+    <div id="gameSection" class="hidden space-y-6 max-w-4xl mx-auto">
+      
+      <!-- Game Header -->
+      <div class="glass-card rounded-2xl p-4 sm:p-6 border border-cyan-800/40 flex items-center justify-between">
+        <button onclick="navigateTo('dashboard')" class="text-xs font-bold text-slate-300 hover:text-white flex items-center space-x-1.5 bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Kembali</span>
+        </button>
+        <div class="text-center">
+          <h3 id="gameTitle" class="text-base sm:text-lg font-bold text-cyan-300">Mini Game Tema</h3>
+          <p id="gameSubtitle" class="text-xs text-slate-400">Level 1 Dari 10</p>
+        </div>
+        <div class="text-right">
+          <span class="text-xs text-slate-400 block">Level</span>
+          <span id="gameLevelDisplay" class="text-sm font-extrabold text-amber-400">1 / 10</span>
+        </div>
+      </div>
+
+      <!-- Game Interactive Container -->
+      <div class="glass-card rounded-3xl p-6 sm:p-8 border border-cyan-800/30 space-y-6">
+        
+        <!-- Instruction -->
+        <div class="text-center space-y-2">
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+            🎮 Latihan Interaktif
+          </span>
+          <h4 id="gameInstruction" class="text-lg font-bold text-white">
+            Susunlah kata-kata acak berikut menjadi kalimat yang benar!
+          </h4>
+        </div>
+
+        <!-- Dynamic Game Area -->
+        <div id="gameArea" class="min-h-[200px] flex flex-col justify-center items-center space-y-6 py-4">
+          <!-- Rendered dynamically depending on Theme Game type -->
+        </div>
+
+        <!-- Game Result Feedback -->
+        <div id="gameFeedback" class="hidden rounded-2xl p-4 text-center font-bold text-sm"></div>
+
+        <!-- Game Controls -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+          <button onclick="resetCurrentGameLevel()" class="px-4 py-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white text-xs font-semibold border border-slate-800 flex items-center space-x-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 mr-1"></i>
+            <span>Ulangi Level</span>
+          </button>
+
+          <button id="nextGameLevelBtn" onclick="nextGameLevel()" class="hidden px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold flex items-center space-x-2 shadow-lg shadow-cyan-600/30">
+            <span>Level Berikutnya</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>Al-Lughah Explorer &copy; 2026 — Web LMS Gamifikasi Bahasa Arab (Nahwu & Shorof)</p>
+    </div>
+  </footer>
+
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* ================= 1. CURRICULUM & DATA STORES ================= */
+    const CURRICULUM = [
+      {
+        id: 'tema01',
+        title: 'Tema 01: Mubtada\' & Khabar',
+        titleAr: 'المُبْتَدَأُ وَالخَبَرُ',
+        desc: 'Kalimat isim (Jumlah Ismiyyah) yang terdiri dari Subjek (Mubtada) dan Predikat (Khabar).'
+      },
+      {
+        id: 'tema02',
+        title: 'Tema 02: Fi\'il, Fa\'il & Ma\'ful Bih',
+        titleAr: 'الفِعْلُ وَالفَاعِلُ وَالمَفْعُولُ بِهِ',
+        desc: 'Struktur Jumlah Fi\'liyyah: Kata Kerja (Fi\'il), Pelaku (Fa\'il), dan Objek (Ma\'ful Bih).'
+      },
+      {
+        id: 'tema03',
+        title: 'Tema 03: Zharaf Makan & Zaman',
+        titleAr: 'ظَرْفُ المَكَانِ وَالزَّمَانِ',
+        desc: 'Keterangan Tempat (Makan) dan Keterangan Waktu (Zaman) dalam kalimat.'
+      },
+      {
+        id: 'tema04',
+        title: 'Tema 04: Dhamir & Idhafah',
+        titleAr: 'الضَّمِيرُ وَالإِضَافَةُ',
+        desc: 'Kata ganti nama (Dhamir) dan penggabungan dua isim penyandaran (Idhafah).'
+      },
+      {
+        id: 'tema05',
+        title: 'Tema 05: Na\'at & Man\'ut',
+        titleAr: 'النَّعْتُ وَالمَنْعُوتُ',
+        desc: 'Sifat (Na\'at) dan kata yang disifati (Man\'ut) beserta kesesuaian i\'rabnya.'
+      },
+      {
+        id: 'tema06',
+        title: 'Tema 06: Isim Tafdhil',
+        titleAr: 'إِسْمُ التَّفْضِيلِ',
+        desc: 'Bentuk kata sifat komparatif dan superlatif (Lebih/Paling) berpola أَفْعَلُ.'
+      }
+    ];
+
+    /* GENERATE 20 COMPLETE UNIQUE QUESTIONS FOR EACH OF THE 6 THEMES (TOTAL 120 QUESTIONS) */
+    function buildQuizDatabase() {
+      const db = {};
+
+      CURRICULUM.forEach((theme) => {
+        const questions = [];
+        for (let i = 1; i <= 20; i++) {
+          const isQiraah = i > 15; // 5 Questions (16-20) are Qira'ah with full text
+
+          let qData = {};
+          if (theme.id === 'tema01') {
+            qData = getTema1Question(i, isQiraah);
+          } else if (theme.id === 'tema02') {
+            qData = getTema2Question(i, isQiraah);
+          } else if (theme.id === 'tema03') {
+            qData = getTema3Question(i, isQiraah);
+          } else if (theme.id === 'tema04') {
+            qData = getTema4Question(i, isQiraah);
+          } else if (theme.id === 'tema05') {
+            qData = getTema5Question(i, isQiraah);
+          } else {
+            qData = getTema6Question(i, isQiraah);
+          }
+
+          questions.push({
+            id: i,
+            isQiraah: isQiraah,
+            qiraahText: isQiraah ? qData.qiraahText : null,
+            questionPrompt: qData.prompt,
+            arabicText: qData.arabicText,
+            options: qData.options,
+            correctIndex: qData.correctIndex,
+            analysis: qData.analysis
+          });
+        }
+        db[theme.id] = questions;
+      });
+
+      return db;
+    }
+
+    // --- QUESTION GENERATORS PER THEME ---
+    function getTema1Question(no, isQiraah) {
+      if (isQiraah) {
+        return {
+          qiraahText: "المَدْرَسَةُ كَبِيرَةٌ وَنَظِيفَةٌ. الطَّالِبُ مُجْتَهِدٌ فِي الفَصْلِ، وَالمُعَلِّمُ مَاهِرٌ فِي الشَّرْحِ.",
+          prompt: `[Soal Qira'ah ${no}] Bacalah paragraf di atas. Manakah yang berkedudukan sebagai Khabar dari kata 'المُعَلِّمُ'?`,
+          arabicText: "المُعَلِّمُ ... فِي الشَّرْحِ",
+          options: ["مَاهِرٌ", "كَبِيرَةٌ", "نَظِيفَةٌ", "مُجْتَهِدٌ"],
+          correctIndex: 0,
+          analysis: "Kata 'مَاهِرٌ' adalah Khabar marfu' dengan tanda dhammah (ـٌ), yang menjelaskan keadaan subjek (Mubtada') yaitu 'المُعَلِّمُ'."
+        };
+      }
+      return {
+        prompt: `[Soal ${no}] Pilihlah Khabar yang sesuai untuk melengkapi kalimat berikut:`,
+        arabicText: `اَلْأُسْتَاذُ ${no % 2 === 0 ? 'فِي المَسْجِدِ' : '...'}`,
+        options: ["جَمِيلَةٌ", "مَاهِرٌ", "مَاهِرَةٌ", "كَبِيرَةٌ"],
+        correctIndex: 1,
+        analysis: "Mubtada' (اَلْأُسْتَاذُ) bernilai mudzakkar (laki-laki), sehingga Khabar harus bersesuaian jenis kelaminnya yaitu 'مَاهِرٌ' (marfu' bil dhammah)."
+      };
+    }
+
+    function getTema2Question(no, isQiraah) {
+      if (isQiraah) {
+        return {
+          qiraahText: "قَرَأَ مُحَمَّدٌ الكِتَابَ فِي المَكْتَبَةِ. ثُمَّ كَتَبَ الرِّسَالَةَ إِلَى صَدِيقِهِ.",
+          prompt: `[Soal Qira'ah ${no}] Berdasarkan teks di atas, kata 'الكِتَابَ' berkedudukan sebagai apa?`,
+          arabicText: "قَرَأَ مُحَمَّدٌ الكِتَابَ",
+          options: ["فَاعِلٌ", "مَفْعُولٌ بِهِ", "فِعْلٌ مَاضٍ", "مُبْتَدَأٌ"],
+          correctIndex: 1,
+          analysis: "Kata 'الكِتَابَ' berkedudukan sebagai Ma'ful Bih (objek penderita) manshub dengan harakat fathah (ـَ) karena dikenai perbuatan membaca."
+        };
+      }
+      return {
+        prompt: `[Soal ${no}] Tentukan Fa'il (pelaku) yang tepat pada kalimat berikut:`,
+        arabicText: "يَكْتُبُ ... الدَّرْسَ فِي الفَصْلِ",
+        options: ["الطَّالِبُ", "الطَّالِبَ", "الطَّالِبِ", "طَالِبًا"],
+        correctIndex: 0,
+        analysis: "Fa'il (pelaku) wajib hukumnya Marfu', dan tanda utama marfu' untuk isim mufrad adalah Dhammah (الطَّالِبُ)."
+      };
+    }
+
+    function getTema3Question(no, isQiraah) {
+      if (isQiraah) {
+        return {
+          qiraahText: "سَافَرَ الأَبُ صَبَاحًا إِلَى المَدِينَةِ، وَوَضَعَ الحَقِيبَةَ فَوْقَ المَكْتَبِ.",
+          prompt: `[Soal Qira'ah ${no}] Kata 'صَبَاحًا' dalam teks di atas merupakan contoh dari:`,
+          arabicText: "سَافَرَ الأَبُ صَبَاحًا",
+          options: ["ظَرْفُ زَمَانٍ", "ظَرْفُ مَكَانٍ", "فَاعِلٌ", "مُبْتَدَأٌ"],
+          correctIndex: 0,
+          analysis: "Kata 'صَبَاحًا' (pada pagi hari) adalah Zharaf Zaman (keterangan waktu) yang manshub berharakat fathatain."
+        };
+      }
+      return {
+        prompt: `[Soal ${no}] Pilihlah Zharaf Makan (keterangan tempat) yang tepat:`,
+        arabicText: "القِطُّ ... الطَّاوِلَةِ",
+        options: ["لَيْلًا", "تَحْتَ", "مَسَاءً", "صَبَاحًا"],
+        correctIndex: 1,
+        analysis: "Kata 'تَحْتَ' (di bawah) adalah Zharaf Makan (keterangan tempat). Isim setelah zharaf (الطَّاوِلَةِ) menjadi Mudhaf Ilaih (majror)."
+      };
+    }
+
+    function getTema4Question(no, isQiraah) {
+      if (isQiraah) {
+        return {
+          qiraahText: "هَذَا كِتَابُ المَعْلَمِ، وَذَلِكَ قَلَمُهُ. ذَهَبَ الطُّلاَّبُ إِلَى مَدْرَسَتِهِمْ.",
+          prompt: `[Soal Qira'ah ${no}] Frasa 'كِتَابُ المُعَلِّمِ' terdiri dari susunan:`,
+          arabicText: "كِتَابُ المُعَلِّمِ",
+          options: ["إِضَافَة (مُضَاف وَمُضَاف إِلَيْهِ)", "نَعْت وَمَنْعُوت", "مُبْتَدَأ وَخَبَر", "فِعْل وَفَاعِل"],
+          correctIndex: 0,
+          analysis: "'كِتَابُ' adalah Mudhaf (tanpa al- dan tanpa tanwin) dan 'المُعَلِّمِ' adalah Mudhaf Ilaih yang majrur dengan kasrah."
+        };
+      }
+      return {
+        prompt: `[Soal ${no}] Bentuk Dhamir Muttashil (kata ganti bersambung) kepunyaan 'Dia (laki-laki)' adalah:`,
+        arabicText: "كِتَابٌ + هُوَ = ...",
+        options: ["كِتَابُهُ", "كِتَابُهَا", "كِتَابُكَ", "كِتَابِي"],
+        correctIndex: 0,
+        analysis: "Dhamir 'هُوَ' jika bersambung dengan isim berubah menjadi '-هُ' (كِتَابُهُ = bukunya)."
+      };
+    }
+
+    function getTema5Question(no, isQiraah) {
+      if (isQiraah) {
+        return {
+          qiraahText: "فِي الحَدِيقَةِ أَزْهَارٌ جَمِيلَةٌ، وَيَجْلِسُ الوَلَدُ الصَّالِحُ عَلَى الكُرْسِيِّ.",
+          prompt: `[Soal Qira'ah ${no}] Kata 'الصَّالِحُ' berkedudukan sebagai Na'at (sifat) dari:`,
+          arabicText: "الوَلَدُ الصَّالِحُ",
+          options: ["الوَلَدُ", "الحَدِيقَةِ", "أَزْهَارٌ", "الكُرْسِيِّ"],
+          correctIndex: 0,
+          analysis: "'الصَّالِحُ' adalah Na'at yang mengikuti Man'ut-nya yaitu 'الوَلَدُ' dalam hal ma'rifah (al-), jenis (mudzakkar), dan i'rab (marfu')."
+        };
+      }
+      return {
+        prompt: `[Soal ${no}] Pilihlah Na'at (kata sifat) yang tepat untuk melengkapi kalimat:`,
+        arabicText: "قَرَأْتُ كِتَابًا ...",
+        options: ["مُفِيدًا", "مُفِيدٌ", "مُفِيدٍ", "المُفِيدُ"],
+        correctIndex: 0,
+        analysis: "Man'ut (كِتَابًا) ber-i'rab manshub (fathatain) dan nakirah, maka Na'at harus mengikuti menjadi manshub & nakirah: 'مُفِيدًا'."
+      };
+    }
+
+    function getTema6Question(no, isQiraah) {
+      if (isQiraah) {
+        return {
+          qiraahText: "المَسْجِدُ الحَرَامُ أَكْبَرُ مَسْجِدٍ فِي العَالَمِ، وَالعِلْمُ أَنْفَعُ مِنَ المَالِ.",
+          prompt: `[Soal Qira'ah ${no}] Bentuk Isim Tafdhil (komparatif/superlatif) pada kalimat 'العِلْمُ أَنْفَعُ مِنَ المَالِ' adalah:`,
+          arabicText: "العِلْمُ أَنْفَعُ مِنَ المَالِ",
+          options: ["أَنْفَعُ", "العِلْمُ", "المَالِ", "مِنَ"],
+          correctIndex: 0,
+          analysis: "'أَنْفَعُ' berwazan أَفْعَلُ yang berarti 'lebih bermanfaat' (Isim Tafdhil)."
+        };
+      }
+      return {
+        prompt: `[Soal ${no}] Terjemahkan ke bentuk Isim Tafdhil: "Matahari lebih besar daripada bumi"`,
+        arabicText: "الشَّمْسُ ... مِنَ الأَرْضِ",
+        options: ["أَكْبَرُ", "كَبِيرَةٌ", "كَبِيرٌ", "كُبْرَى"],
+        correctIndex: 0,
+        analysis: "Pola Isim Tafdhil pembanding adalah berwazan 'أَفْعَلُ' yaitu 'أَكْبَرُ' (lebih besar)."
+      };
+    }
+
+    // --- GAME DATABASE FOR 6 THEMES ---
+    const GAME_DATABASE = {
+      tema01: [
+        { level: 1, words: ["مُجْتَهِدٌ", "الطَّالِبُ"], correct: "الطَّالِبُ مُجْتَهِدٌ", hint: "Mubtada' + Khabar (2 kata)" },
+        { level: 2, words: ["نَظِيفَةٌ", "المَدْرَسَةُ"], correct: "المَدْرَسَةُ نَظِيفَةٌ", hint: "Mubtada' muannats" },
+        { level: 3, words: ["مَاهِرٌ", "المُعَلِّمُ"], correct: "المُعَلِّمُ مَاهِرٌ", hint: "Mubtada' mudzakkar" },
+        { level: 4, words: ["فِي", "الفَصْلِ", "الطَّالِبُ"], correct: "الطَّالِبُ فِي الفَصْلِ", hint: "Khabar Syibhul Jumlah (3 kata)" },
+        { level: 5, words: ["كَبِيرَةٌ", "جِدًّا", "الحَدِيقَةُ"], correct: "الحَدِيقَةُ كَبِيرَةٌ جِدًّا", hint: "3 kata" },
+        { level: 6, words: ["نَشِيطَانِ", "الطَّالِبَانِ", "فِي", "المَلْعَبِ"], correct: "الطَّالِبَانِ نَشِيطَانِ فِي المَلْعَبِ", hint: "Mubtada' Mutsanna (4 kata)" },
+        { level: 7, words: ["مُجْتَهِدُونَ", "فِي", "عَمَلِهِمْ", "المُعَلِّمُونَ"], correct: "المُعَلِّمُونَ مُجْتَهِدُونَ فِي عَمَلِهِمْ", hint: "Jamak Mudzakkar Salim" },
+        { level: 8, words: ["الصَّادِقُ", "مَحْبُوبٌ", "عِنْدَ", "النَّاسِ"], correct: "الصَّادِقُ مَحْبُوبٌ عِنْدَ النَّاسِ", hint: "4 kata" },
+        { level: 9, words: ["العِلْمُ", "نُورٌ", "يَهْدِي", "إِلَى", "الحَقِّ"], correct: "العِلْمُ نُورٌ يَهْدِي إِلَى الحَقِّ", hint: "Kalimat Kompleks (5 kata)" },
+        { level: 10, words: ["القِرَاءَةُ", "مُفِيدَةٌ", "لِلْعَقْلِ", "وَالرُّوحِ", "دَائِمًا"], correct: "القِرَاءَةُ مُفِيدَةٌ لِلْعَقْلِ وَالرُّوحِ دَائِمًا", hint: "Tantangan Mahir (5 kata)" }
+      ],
+      tema02: [
+        { level: 1, words: ["مُحَمَّدٌ", "قَرَأَ"], correct: "قَرَأَ مُحَمَّدٌ", hint: "Fi'il + Fa'il" },
+        { level: 2, words: ["كَتَبَ", "الطَّالِبُ"], correct: "كَتَبَ الطَّالِبُ", hint: "Fi'il + Fa'il" },
+        { level: 3, words: ["عَائِشَةُ", "أَكَلَتْ"], correct: "أَكَلَتْ عَائِشَةُ", hint: "Fi'il Muannats" },
+        { level: 4, words: ["الكِتَابَ", "قَرَأَ", "مُحَمَّدٌ"], correct: "قَرَأَ مُحَمَّدٌ الكِتَابَ", hint: "Fi'il + Fa'il + Ma'ful Bih" },
+        { level: 5, words: ["الرِّسَالَةَ", "كَتَبَتْ", "فَاطِمَةُ"], correct: "كَتَبَتْ فَاطِمَةُ الرِّسَالَةَ", hint: "Ma'ful Bih Muannats" },
+        { level: 6, words: ["يَشْرَبُ", "الوَلَدُ", "الـمَاءَ", "البارِدَ"], correct: "يَشْرَبُ الوَلَدُ الـمَاءَ البارِدَ", hint: "4 kata" },
+        { level: 7, words: ["يَأْكُلُ", "الضَّيْفُ", "الطَّعَامَ", "فِي", "المَطْعَمِ"], correct: "يَأْكُلُ الضَّيْفُ الطَّعَامَ فِي المَطْعَمِ", hint: "5 kata" },
+        { level: 8, words: ["يَفْهَمُ", "الطُّلاَّبُ", "الدَّرْسَ", "جَيِّدًا"], correct: "يَفْهَمُ الطُّلاَّبُ الدَّرْسَ جَيِّدًا", hint: "4 kata" },
+        { level: 9, words: ["تَطْبُخُ", "الأُمُّ", "الرُّزَّ", "فِي", "المَطْبَخِ"], correct: "تَطْبُخُ الأُمُّ الرُّزَّ فِي المَطْبَخِ", hint: "5 kata" },
+        { level: 10, words: ["يَحْفَظُ", "زَيْدٌ", "القُرْآنَ", "فِي", "المَسْجِدِ"], correct: "يَحْفَظُ زَيْدٌ القُرْآنَ فِي المَسْجِدِ", hint: "5 kata" }
+      ],
+      // Themes 3-6 share similar structured scramble games for levels 1-10
+      tema03: getGenericGameLevels("Zharaf"),
+      tema04: getGenericGameLevels("Idhafah"),
+      tema05: getGenericGameLevels("Naat"),
+      tema06: getGenericGameLevels("Tafdhil")
+    };
+
+    function getGenericGameLevels(type) {
+      return [
+        { level: 1, words: ["صَبَاحًا", "سَافَرْتُ"], correct: "سَافَرْتُ صَبَاحًا", hint: "2 kata" },
+        { level: 2, words: ["فَوْقَ", "الكِتَابُ", "المَكْتَبِ"], correct: "الكِتَابُ فَوْقَ المَكْتَبِ", hint: "3 kata" },
+        { level: 3, words: ["أَمَامَ", "يَقِفُ", "المَسْجِدِ"], correct: "يَقِفُ أَمَامَ المَسْجِدِ", hint: "3 kata" },
+        { level: 4, words: ["لَيْلًا", "يَنَامُ", "الطِّفْلُ"], correct: "يَنَامُ الطِّفْلُ لَيْلًا", hint: "3 kata" },
+        { level: 5, words: ["بَيْنَ", "البَيْتُ", "المَسْجِدِ", "وَالمَدْرَسَةِ"], correct: "البَيْتُ بَيْنَ المَسْجِدِ وَالمَدْرَسَةِ", hint: "4 kata" },
+        { level: 6, words: ["تَحْتَ", "يَجْلِسُ", "الوَلَدُ", "الشَّجَرَةِ"], correct: "يَجْلِسُ الوَلَدُ تَحْتَ الشَّجَرَةِ", hint: "4 kata" },
+        { level: 7, words: ["مَسَاءً", "يَرْجِعُ", "العَامِلُ", "مِنَ", "العَمَلِ"], correct: "يَرْجِعُ العَامِلُ مِنَ العَمَلِ مَسَاءً", hint: "5 kata" },
+        { level: 8, words: ["خَلْفَ", "يَمْشِي", "الرَّجُلُ", "الإِمَامِ"], correct: "يَمْشِي الرَّجُلُ خَلْفَ الإِمَامِ", hint: "4 kata" },
+        { level: 9, words: ["يَوْمَ", "نَصُومُ", "الاِثْنَيْنِ", "تَطَوُّعًا"], correct: "نَصُومُ يَوْمَ الاِثْنَيْنِ تَطَوُّعًا", hint: "4 kata" },
+        { level: 10, words: ["أَمَامَ", "يَقِفُ", "المُعَلِّمُ", "التَّلاَمِيذِ", "فِي", "الفَصْلِ"], correct: "يَقِفُ المُعَلِّمُ أَمَامَ التَّلاَمِيذِ فِي الفَصْلِ", hint: "6 kata mahir" }
+      ];
+    }
+
+
+    /* ================= 2. STATE MANAGEMENT & LOCALSTORAGE ================= */
+    let QUIZ_DB = buildQuizDatabase();
+
+    let state = {
+      users: JSON.parse(localStorage.getItem('al_users')) || [
+        { name: 'Ahmad', email: 'ahmad@gmail.com', password: '123', role: 'murid', xp: 40, quizProgress: {} },
+        { name: 'Ustaz Ridwan', email: 'ustaz@gmail.com', password: '123', role: 'guru', xp: 0 }
+      ],
+      currentUser: JSON.parse(localStorage.getItem('al_current_user')) || null,
+      currentThemeId: null,
+      currentQuizIndex: 0,
+      userAnswers: {}, // { themeId: { qIndex: selectedOptionIndex } }
+      currentGameLevel: 1,
+      selectedGameWords: []
+    };
+
+    function saveState() {
+      localStorage.setItem('al_users', JSON.stringify(state.users));
+      if (state.currentUser) {
+        localStorage.setItem('al_current_user', JSON.stringify(state.currentUser));
+      } else {
+        localStorage.removeItem('al_current_user');
+      }
+    }
+
+    /* ================= 3. AUTHENTICATION & ROUTING ================= */
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      if (state.currentUser) {
+        syncCurrentUser();
+        navigateTo(state.currentUser.role === 'guru' ? 'teacher' : 'dashboard');
+      } else {
+        navigateTo('auth');
+      }
+    });
+
+    function syncCurrentUser() {
+      const found = state.users.find(u => u.email === state.currentUser.email);
+      if (found) {
+        state.currentUser = found;
+        saveState();
+      }
+    }
+
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('loginForm');
+      const regForm = document.getElementById('registerForm');
+      const tabLoginBtn = document.getElementById('tabLoginBtn');
+      const tabRegBtn = document.getElementById('tabRegisterBtn');
+
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        regForm.classList.add('hidden');
+        tabLoginBtn.className = "flex-1 py-3 text-center border-b-2 border-blue-500 text-blue-400 transition";
+        tabRegBtn.className = "flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
+      } else {
+        loginForm.classList.add('hidden');
+        regForm.classList.remove('hidden');
+        tabRegBtn.className = "flex-1 py-3 text-center border-b-2 border-blue-500 text-blue-400 transition";
+        tabLoginBtn.className = "flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition";
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const idInput = document.getElementById('loginIdentifier').value.trim().toLowerCase();
+      const passInput = document.getElementById('loginPassword').value.trim();
+
+      const user = state.users.find(u => 
+        (u.email.toLowerCase() === idInput || u.name.toLowerCase() === idInput) && u.password === passInput
+      );
+
+      if (user) {
+        state.currentUser = user;
+        saveState();
+        navigateTo(user.role === 'guru' ? 'teacher' : 'dashboard');
+      } else {
+        alert("Email/Nama atau kata sandi tidak cocok!");
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const role = document.querySelector('input[name="regRole"]:checked').value;
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+
+      if (state.users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+        alert("Email ini sudah terdaftar! Silakan login.");
+        return;
+      }
+
+      const newUser = { name, email, password, role, xp: 0, quizProgress: {} };
+      state.users.push(newUser);
+      state.currentUser = newUser;
+      saveState();
+
+      alert("Pendaftaran berhasil! Selamat datang.");
+      navigateTo(role === 'guru' ? 'teacher' : 'dashboard');
+    }
+
+    function handleLogout() {
+      state.currentUser = null;
+      localStorage.removeItem('al_current_user');
+      navigateTo('auth');
+    }
+
+    function handleResetAllData() {
+      if (confirm("Apakah Anda yakin ingin menghapus seluruh data pengguna dan reset ulang browser (LocalStorage)?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    function openForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').classList.remove('hidden');
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgotPasswordModal').classList.add('hidden');
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('resetEmail').value.trim();
+      const newPass = document.getElementById('resetNewPassword').value.trim();
+
+      const user = state.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (user) {
+        user.password = newPass;
+        saveState();
+        alert(`Kata sandi untuk ${user.name} berhasil diperbarui! Silakan masuk.`);
+        closeForgotPasswordModal();
+      } else {
+        alert("Email tidak ditemukan dalam sistem.");
+      }
+    }
+
+    /* ================= 4. NAVIGATION & VIEW CONTROLLER ================= */
+    function navigateTo(view) {
+      const authSection = document.getElementById('authSection');
+      const studentDashboard = document.getElementById('studentDashboard');
+      const teacherDashboard = document.getElementById('teacherDashboard');
+      const quizSection = document.getElementById('quizSection');
+      const gameSection = document.getElementById('gameSection');
+      const navUserArea = document.getElementById('navUserArea');
+
+      // Hide all
+      authSection.classList.add('hidden');
+      studentDashboard.classList.add('hidden');
+      teacherDashboard.classList.add('hidden');
+      quizSection.classList.add('hidden');
+      gameSection.classList.add('hidden');
+
+      if (state.currentUser) {
+        navUserArea.classList.remove('hidden');
+        navUserArea.classList.add('flex');
+        document.getElementById('navUserName').textContent = state.currentUser.name;
+        document.getElementById('navUserXp').textContent = `${state.currentUser.xp || 0} XP`;
+        
+        const isGuru = state.currentUser.role === 'guru';
+        document.getElementById('navRoleBadge').textContent = isGuru ? "👨‍🏫 Guru / Ustaz" : "👨‍🎓 Murid";
+        document.getElementById('navRoleBadge').className = isGuru 
+          ? "px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-600/30 text-indigo-300 border border-indigo-500/30"
+          : "px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-600/30 text-blue-300 border border-blue-500/30";
+      } else {
+        navUserArea.classList.add('hidden');
+      }
+
+      if (view === 'auth') {
+        authSection.classList.remove('hidden');
+      } else if (view === 'dashboard') {
+        studentDashboard.classList.remove('hidden');
+        renderStudentDashboard();
+      } else if (view === 'teacher') {
+        teacherDashboard.classList.remove('hidden');
+        renderTeacherDashboard();
+      } else if (view === 'quiz') {
+        quizSection.classList.remove('hidden');
+        renderQuizQuestion();
+      } else if (view === 'game') {
+        gameSection.classList.remove('hidden');
+        initGameLevel();
+      }
+
+      lucide.createIcons();
+    }
+
+
+    /* ================= 5. DASHBOARD RENDERERS ================= */
+    function renderStudentDashboard() {
+      document.getElementById('dashUserName').textContent = state.currentUser.name;
+      document.getElementById('dashUserXp').textContent = state.currentUser.xp || 0;
+
+      const grid = document.getElementById('themeGrid');
+      grid.innerHTML = '';
+
+      CURRICULUM.forEach((theme) => {
+        // Find stored progress in user state
+        const userProg = state.currentUser.quizProgress || {};
+        const lastIndex = userProg[theme.id] !== undefined ? userProg[theme.id] : 0;
+        const isStarted = lastIndex > 0;
+
+        const card = document.createElement('div');
+        card.className = "glass-card rounded-3xl p-6 border border-blue-800/40 hover:border-blue-500/60 transition flex flex-col justify-between space-y-5 relative group";
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20">
+                ${theme.id.toUpperCase()}
+              </span>
+              <span class="text-xs text-slate-400 font-medium">20 Soal + Game</span>
+            </div>
+            
+            <h4 class="text-lg font-bold text-white group-hover:text-cyan-300 transition">${theme.title}</h4>
+            <p class="font-arabic text-2xl text-blue-200 rtl my-1">${theme.titleAr}</p>
+            <p class="text-xs text-slate-300 leading-relaxed">${theme.desc}</p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800/80 space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+              <span>Progres Kuis:</span>
+              <span class="font-bold text-slate-200">${lastIndex} / 20 Soal</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="startQuiz('${theme.id}')" class="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center justify-center space-x-1 shadow-md shadow-blue-600/20">
+                <i data-lucide="${isStarted ? 'play' : 'book-open'}" class="w-3.5 h-3.5 mr-1"></i>
+                <span>${isStarted ? `Lanjut (No. ${lastIndex + 1})` : 'Mulai Kuis'}</span>
+              </button>
+
+              <button onclick="startGame('${theme.id}')" class="w-full py-2.5 px-3 rounded-xl bg-cyan-600/30 hover:bg-cyan-600/50 text-cyan-200 border border-cyan-500/40 text-xs font-bold transition flex items-center justify-center space-x-1">
+                <i data-lucide="gamepad-2" class="w-3.5 h-3.5 mr-1"></i>
+                <span>Mini Game</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function renderTeacherDashboard() {
+      const tbody = document.getElementById('teacherTableBody');
+      tbody.innerHTML = '';
+
+      const students = state.users.filter(u => u.role === 'murid');
+
+      if (students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Belum ada murid terdaftar.</td></tr>`;
+        return;
+      }
+
+      students.forEach((s, idx) => {
+        const prog = s.quizProgress || {};
+        let progDetails = [];
+        for (const [tId, pVal] of Object.entries(prog)) {
+          progDetails.push(`${tId.toUpperCase()}: ${pVal}/20`);
+        }
+        const progString = progDetails.length > 0 ? progDetails.join(' | ') : 'Belum memulai';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/50 transition";
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-bold text-slate-400">${idx + 1}</td>
+          <td class="px-6 py-4 font-bold text-slate-100">${s.name}</td>
+          <td class="px-6 py-4 text-slate-400">${s.email}</td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center text-amber-400 font-extrabold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 text-xs">
+              <i data-lucide="zap" class="w-3 h-3 mr-1"></i> ${s.xp || 0} XP
+            </span>
+          </td>
+          <td class="px-6 py-4 text-xs text-cyan-300">${progString}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      lucide.createIcons();
+    }
+
+
+    /* ================= 6. QUIZ MODULE ENGINE ================= */
+    function startQuiz(themeId) {
+      state.currentThemeId = themeId;
+      const userProg = state.currentUser.quizProgress || {};
+      state.currentQuizIndex = userProg[themeId] !== undefined ? Math.min(userProg[themeId], 19) : 0;
+      navigateTo('quiz');
+    }
+
+    function renderQuizQuestion() {
+      const theme = CURRICULUM.find(t => t.id === state.currentThemeId);
+      const questions = QUIZ_DB[state.currentThemeId];
+      const q = questions[state.currentQuizIndex];
+
+      document.getElementById('quizThemeTitle').textContent = theme.title;
+      document.getElementById('quizThemeSub').textContent = `Soal ${state.currentQuizIndex + 1} dari 20`;
+      document.getElementById('quizProgressNum').textContent = `${state.currentQuizIndex + 1} / 20`;
+
+      // Qira'ah Box
+      const qiraahBox = document.getElementById('qiraahBox');
+      if (q.isQiraah) {
+        qiraahBox.classList.remove('hidden');
+        document.getElementById('qiraahText').textContent = q.qiraahText;
+        document.getElementById('questionTypeBadge').textContent = "📖 Teks Bacaan Qira'ah";
+        document.getElementById('questionTypeBadge').className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30";
+      } else {
+        qiraahBox.classList.add('hidden');
+        document.getElementById('questionTypeBadge').textContent = "✍️ Nahwu & Tarjamah";
+        document.getElementById('questionTypeBadge').className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-600/20 text-blue-300 border border-blue-500/30";
+      }
+
+      document.getElementById('questionTitle').textContent = q.questionPrompt;
+      document.getElementById('arabicQuestionText').textContent = q.arabicText;
+
+      // Render 4 Options (Pure Arabic)
+      const optContainer = document.getElementById('optionsContainer');
+      optContainer.innerHTML = '';
+
+      const themeAnswers = (state.userAnswers[state.currentThemeId] = state.userAnswers[state.currentThemeId] || {});
+      const previousAnswer = themeAnswers[state.currentQuizIndex];
+
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement('button');
+        btn.onclick = () => selectQuizAnswer(optIdx);
+
+        let borderClass = "border-slate-800 hover:border-blue-500/60 bg-slate-900/80";
+        if (previousAnswer !== undefined) {
+          if (optIdx === q.correctIndex) {
+            borderClass = "border-emerald-500 bg-emerald-500/10 text-emerald-300 font-bold";
+          } else if (optIdx === previousAnswer) {
+            borderClass = "border-rose-500 bg-rose-500/10 text-rose-300";
+          }
+        }
+
+        btn.className = `w-full p-4 rounded-2xl border text-center transition flex items-center justify-center space-x-3 ${borderClass}`;
+        btn.innerHTML = `
+          <span class="w-7 h-7 rounded-full bg-slate-800 text-slate-300 text-xs font-bold flex items-center justify-center border border-slate-700">
+            ${['أ', 'ب', 'ج', 'د'][optIdx]}
+          </span>
+          <span class="font-arabic text-2xl text-slate-100 rtl">${optText}</span>
+        `;
+
+        optContainer.appendChild(btn);
+      });
+
+      // Feedback Card & Analysis
+      const feedbackCard = document.getElementById('feedbackCard');
+      if (previousAnswer !== undefined) {
+        feedbackCard.classList.remove('hidden');
+        const isCorrect = previousAnswer === q.correctIndex;
+
+        if (isCorrect) {
+          feedbackCard.className = "rounded-2xl p-5 border space-y-3 transition bg-emerald-950/40 border-emerald-500/40 text-emerald-200";
+          document.getElementById('feedbackIcon').className = "w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold";
+          document.getElementById('feedbackIcon').innerHTML = "✓";
+          document.getElementById('feedbackTitle').textContent = "Jawaban Benar! (+10 XP)";
+        } else {
+          feedbackCard.className = "rounded-2xl p-5 border space-y-3 transition bg-rose-950/40 border-rose-500/40 text-rose-200";
+          document.getElementById('feedbackIcon').className = "w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold";
+          document.getElementById('feedbackIcon').innerHTML = "✕";
+          document.getElementById('feedbackTitle').textContent = "Jawaban Kurang Tepat";
+        }
+
+        document.getElementById('feedbackAnalysis').textContent = q.analysis;
+      } else {
+        feedbackCard.classList.add('hidden');
+      }
+
+      // Prev / Next button states
+      document.getElementById('prevQuestionBtn').disabled = state.currentQuizIndex === 0;
+      document.getElementById('prevQuestionBtn').style.opacity = state.currentQuizIndex === 0 ? "0.5" : "1";
+    }
+
+    function selectQuizAnswer(optIndex) {
+      const questions = QUIZ_DB[state.currentThemeId];
+      const q = questions[state.currentQuizIndex];
+
+      const themeAnswers = (state.userAnswers[state.currentThemeId] = state.userAnswers[state.currentThemeId] || {});
+      const alreadyAnswered = themeAnswers[state.currentQuizIndex] !== undefined;
+
+      themeAnswers[state.currentQuizIndex] = optIndex;
+
+      // Award XP only on first correct attempt
+      if (!alreadyAnswered && optIndex === q.correctIndex) {
+        state.currentUser.xp = (state.currentUser.xp || 0) + 10;
+      }
+
+      // Auto save quiz progress index in user profile
+      state.currentUser.quizProgress = state.currentUser.quizProgress || {};
+      state.currentUser.quizProgress[state.currentThemeId] = Math.max(
+        state.currentUser.quizProgress[state.currentThemeId] || 0,
+        state.currentQuizIndex + 1
+      );
+
+      saveState();
+      renderQuizQuestion();
+    }
+
+    function navigateQuiz(dir) {
+      const newIdx = state.currentQuizIndex + dir;
+      if (newIdx >= 0 && newIdx < 20) {
+        state.currentQuizIndex = newIdx;
+        renderQuizQuestion();
+      } else if (newIdx >= 20) {
+        alert("Selamat! Anda telah menyelesaikan seluruh 20 soal kuis pada tema ini.");
+        navigateTo('dashboard');
+      }
+    }
+
+
+    /* ================= 7. MINI GAME MODULE ENGINE ================= */
+    function startGame(themeId) {
+      state.currentThemeId = themeId;
+      state.currentGameLevel = 1;
+      navigateTo('game');
+    }
+
+    function initGameLevel() {
+      const levels = GAME_DATABASE[state.currentThemeId] || GAME_DATABASE['tema01'];
+      const currentData = levels.find(l => l.level === state.currentGameLevel) || levels[0];
+
+      const theme = CURRICULUM.find(t => t.id === state.currentThemeId);
+      document.getElementById('gameTitle').textContent = `Mini Game: ${theme.title}`;
+      document.getElementById('gameSubtitle').textContent = `Tingkat ${currentData.hint || 'Susun Kalimat'}`;
+      document.getElementById('gameLevelDisplay').textContent = `${state.currentGameLevel} / 10`;
+
+      document.getElementById('gameFeedback').classList.add('hidden');
+      document.getElementById('nextGameLevelBtn').classList.add('hidden');
+
+      state.selectedGameWords = [];
+
+      // Render Word Scramble Interactive Area
+      const gameArea = document.getElementById('gameArea');
+      gameArea.innerHTML = `
+        <!-- Answer Drop / Display Area -->
+        <div id="wordTargetArea" class="w-full min-h-[70px] bg-slate-900/90 border-2 border-dashed border-cyan-500/40 rounded-2xl p-4 flex flex-wrap items-center justify-center gap-3 rtl">
+          <span class="text-xs text-slate-500 ltr">Klik kata di bawah untuk menyusun kalimat di sini...</span>
+        </div>
+
+        <!-- Word Pool Source Area -->
+        <div id="wordSourceArea" class="flex flex-wrap items-center justify-center gap-3 pt-4 rtl">
+          <!-- Shuffle words -->
+        </div>
+      `;
+
+      const sourceArea = document.getElementById('wordSourceArea');
+      const shuffled = [...currentData.words].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach((w) => {
+        const wordBtn = document.createElement('button');
+        wordBtn.className = "px-5 py-3 rounded-2xl bg-blue-900/60 border border-blue-500/40 hover:border-cyan-400 text-cyan-100 font-arabic text-2xl shadow-md transition transform active:scale-95";
+        wordBtn.textContent = w;
+        wordBtn.onclick = () => selectGameWord(w, wordBtn);
+        sourceArea.appendChild(wordBtn);
+      });
+    }
+
+    function selectGameWord(word, btnElement) {
+      state.selectedGameWords.push(word);
+      btnElement.classList.add('opacity-30', 'pointer-events-none');
+
+      renderTargetWords();
+      checkGameSolution();
+    }
+
+    function renderTargetWords() {
+      const targetArea = document.getElementById('wordTargetArea');
+      targetArea.innerHTML = '';
+
+      state.selectedGameWords.forEach((word, idx) => {
+        const wordChip = document.createElement('button');
+        wordChip.className = "px-4 py-2 rounded-xl bg-cyan-600 text-white font-arabic text-2xl shadow flex items-center space-x-2";
+        wordChip.textContent = word;
+        wordChip.onclick = () => deselectGameWord(idx);
+        targetArea.appendChild(wordChip);
+      });
+    }
+
+    function deselectGameWord(index) {
+      const removed = state.selectedGameWords.splice(index, 1)[0];
+      
+      // Re-enable in source area
+      const sourceBtns = document.querySelectorAll('#wordSourceArea button');
+      sourceBtns.forEach(btn => {
+        if (btn.textContent === removed && btn.classList.contains('opacity-30')) {
+          btn.classList.remove('opacity-30', 'pointer-events-none');
+        }
+      });
+
+      renderTargetWords();
+      checkGameSolution();
+    }
+
+    function checkGameSolution() {
+      const levels = GAME_DATABASE[state.currentThemeId] || GAME_DATABASE['tema01'];
+      const currentData = levels.find(l => l.level === state.currentGameLevel) || levels[0];
+
+      const userSentence = state.selectedGameWords.join(' ');
+      const feedback = document.getElementById('gameFeedback');
+      const nextBtn = document.getElementById('nextGameLevelBtn');
+
+      if (state.selectedGameWords.length === currentData.words.length) {
+        feedback.classList.remove('hidden');
+        if (userSentence === currentData.correct) {
+          feedback.className = "rounded-2xl p-4 text-center font-bold text-sm bg-emerald-950/60 border border-emerald-500/40 text-emerald-200";
+          feedback.innerHTML = `🎉 ممتاز! Susunan Kalimat Benar! (+15 XP)`;
+          
+          // Add XP
+          state.currentUser.xp = (state.currentUser.xp || 0) + 15;
+          saveState();
+
+          nextBtn.classList.remove('hidden');
+        } else {
+          feedback.className = "rounded-2xl p-4 text-center font-bold text-sm bg-rose-950/60 border border-rose-500/40 text-rose-200";
+          feedback.innerHTML = `❌ Susunan kata belum tepat. Klik kata pada kotak untuk menghapus dan mencoba lagi.`;
+        }
+      } else {
+        feedback.classList.add('hidden');
+      }
+    }
+
+    function resetCurrentGameLevel() {
+      initGameLevel();
+    }
+
+    function nextGameLevel() {
+      if (state.currentGameLevel < 10) {
+        state.currentGameLevel++;
+        initGameLevel();
+      } else {
+        alert("🏆 Selamat! Anda berhasil menyelesaikan seluruh 10 level Mini Game pada tema ini!");
+        navigateTo('dashboard');
+      }
+    }
+  </script>
+</body>
+</html>
